@@ -17,11 +17,13 @@
 
 **要点**
 
-1. 运行truffle migrate部署合约时，自定义部署脚本2_deploy.js中 ```javascript await token.passMinterRole(dbank.address)```把minter token权限赋给dbank合约地址，是为了让dbank合约能在用户赎回的时候付给用户流动性收益；
+1. 运行truffle migrate部署合约时，自定义部署脚本2_deploy.js中 
+```javascript await token.passMinterRole(dbank.address)```
+把minter token权限赋给dbank合约地址，是为了让dbank合约能在用户赎回的时候付给用户流动性收益；
 
-2，Token合约继承自solidiy开源库openzeppelin的ERC20合约，这些库已经过审核以实现高标准的安全性，所以依赖于它们的合约在正确使用时不易受到黑客攻击。
+2. Token合约继承自solidiy开源库openzeppelin的ERC20合约，这些库已经过审核以实现高标准的安全性，所以依赖于它们的合约在正确使用时不易受到黑客攻击。
 
-3，调用赎回函数withdraw()的时候，dbank合约会根据质押ETH的时间来计算流动性收益，年化收益是10%，质押和赎回的时候dbank会记录当时的block.timestamp，时长就是两个timestamp的差值，然后根据时长的秒数在一年中所占比例计算流动性收益。
+3. 用户赎回ETH的时候，dbank合约会根据质押ETH的时间来计算流动性收益，年化收益是10%，质押和赎回的时候dbank会记录当时的block.timestamp，时长就是两个timestamp的差值，然后根据时长的秒数在一年中所占比例计算流动性收益。
 ```javascript withdraw() public {
     //判断用户是否质押了ETH，没有质押则不能赎回
     require(isDeposited[msg.sender]==true, 'Error, no previous deposit');
@@ -40,10 +42,28 @@
     //付给用户流动性收益，用的时token代币
     token.mint(msg.sender, interest); 
 
-    //重置用户的状态
+    //重置质押的状态
     depositStart[msg.sender] = 0;
     etherBalanceOf[msg.sender] = 0;
     isDeposited[msg.sender] = false;
     //触发Withdraw事件，通知前端
     emit Withdraw(msg.sender, userBalance, depositTime, interest);
+  }```
+  
+  4，用户借贷的时候会抵押ETH，可以借到token，数额是抵押的ETH的一半，偿还的时候除了要归还借出的token外，还要偿还一定数额（10%的抵押ETH）的ETH作为借贷利息。
+  ```javascript function payOff() public {
+    //判断用户是否已经抵押ETH用于借贷，没有则不能偿还
+    require(isBorrowed[msg.sender] == true, 'Error, loan not active');
+    //偿还借出的token代币，成功则继续
+    require(token.transferFrom(msg.sender, address(this), collateralEther[msg.sender]/2), "Error, can't receive tokens"); 
+    //计算借贷利息，数额是抵押ETH的10%
+    uint fee = collateralEther[msg.sender]/10; 
+    feeEther[msg.sender] = fee;
+    //转给用户抵押的ETH，但是要减掉借贷利息，相当于是用ETH来偿还利息
+    msg.sender.transfer(collateralEther[msg.sender]-fee);
+    //充值借贷状态
+    collateralEther[msg.sender] = 0;
+    isBorrowed[msg.sender] = false;
+    //触发偿还事件
+    emit PayOff(msg.sender, fee);
   }```
