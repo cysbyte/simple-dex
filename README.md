@@ -51,7 +51,7 @@
   }
   ```
   
-  4，用户借贷的时候会抵押ETH，可以借到token，数额是抵押的ETH的一半，偿还的时候除了要归还借出的token外，还要偿还一定数额（10%的抵押ETH）的ETH作为借贷利息。
+  4. 用户借贷的时候会抵押ETH，可以借到token，数额是抵押的ETH的一半，偿还的时候除了要归还借出的token外，还要偿还一定数额（10%的抵押ETH）的ETH作为借贷利息。
   ```javascript function payOff() public {
     //判断用户是否已经抵押ETH用于借贷，没有则不能偿还
     require(isBorrowed[msg.sender] == true, 'Error, loan not active');
@@ -68,3 +68,15 @@
     //触发偿还事件
     emit PayOff(msg.sender, fee);
   }```
+  
+  5. 前端React监听Solidity emit 的 PayOff事件，更新Fee：
+  ```javascript dbank.events.PayOff((error, event) => {
+          if(!error){
+            console.log(event)
+            let fee = web3.utils.fromWei(event.returnValues.fee, 'ether')
+            this.setState({fee: fee})
+          }else{
+            console.log(error)
+          }
+        })
+   ```
