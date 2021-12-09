@@ -67,7 +67,8 @@
     isBorrowed[msg.sender] = false;
     //触发偿还事件
     emit PayOff(msg.sender, fee);
-  }```
+  }
+  ```
   
   5. 前端React监听Solidity emit 的 PayOff事件，更新Fee：
   ```javascript dbank.events.PayOff((error, event) => {
