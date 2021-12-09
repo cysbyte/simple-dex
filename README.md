@@ -17,11 +17,11 @@
 
 **要点**
 
-1. 运行truffle migrate部署合约时，自定义部署脚本2_deploy.js中 
+1. 运行truffle migrate部署合约时，自定义部署脚本2_deploy.js中如下代码，把minter token权限赋给dbank合约地址，是为了让dbank合约在用户赎回的时候能够付给用户流动性收益；
 ```javascript 
 await token.passMinterRole(dbank.address)
 ```
-把minter token权限赋给dbank合约地址，是为了让dbank合约能在用户赎回的时候付给用户流动性收益；
+
 
 2. Token合约继承自solidiy开源库openzeppelin的ERC20合约，这些库已经过审核以实现高标准的安全性，所以依赖于它们的合约在正确使用时不易受到黑客攻击。
 
