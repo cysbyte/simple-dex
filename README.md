@@ -18,13 +18,16 @@
 **要点**
 
 1. 运行truffle migrate部署合约时，自定义部署脚本2_deploy.js中 
-```javascript await token.passMinterRole(dbank.address)```
+```javascript 
+await token.passMinterRole(dbank.address)
+```
 把minter token权限赋给dbank合约地址，是为了让dbank合约能在用户赎回的时候付给用户流动性收益；
 
 2. Token合约继承自solidiy开源库openzeppelin的ERC20合约，这些库已经过审核以实现高标准的安全性，所以依赖于它们的合约在正确使用时不易受到黑客攻击。
 
 3. 用户赎回ETH的时候，dbank合约会根据质押ETH的时间来计算流动性收益，年化收益是10%，质押和赎回的时候dbank会记录当时的block.timestamp，时长就是两个timestamp的差值，然后根据时长的秒数在一年中所占比例计算流动性收益。
-```javascript withdraw() public {
+```javascript 
+withdraw() public {
     //判断用户是否质押了ETH，没有质押则不能赎回
     require(isDeposited[msg.sender]==true, 'Error, no previous deposit');
     //获取用户质押的ETH数额
@@ -52,7 +55,8 @@
   ```
   
   4. 用户借贷的时候会抵押ETH，可以借到token，数额是抵押的ETH的一半，偿还的时候除了要归还借出的token外，还要偿还一定数额（10%的抵押ETH）的ETH作为借贷利息。
-  ```javascript function payOff() public {
+  ```javascript 
+  function payOff() public {
     //判断用户是否已经抵押ETH用于借贷，没有则不能偿还
     require(isBorrowed[msg.sender] == true, 'Error, loan not active');
     //偿还借出的token代币，成功则继续
@@ -71,7 +75,8 @@
   ```
   
   5. 前端React监听Solidity emit 的 PayOff事件，更新Fee：
-  ```javascript dbank.events.PayOff((error, event) => {
+  ```javascript 
+  dbank.events.PayOff((error, event) => {
           if(!error){
             console.log(event)
             let fee = web3.utils.fromWei(event.returnValues.fee, 'ether')
