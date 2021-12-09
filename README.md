@@ -48,7 +48,8 @@
     isDeposited[msg.sender] = false;
     //触发Withdraw事件，通知前端
     emit Withdraw(msg.sender, userBalance, depositTime, interest);
-  }```
+  }
+  ```
   
   4，用户借贷的时候会抵押ETH，可以借到token，数额是抵押的ETH的一半，偿还的时候除了要归还借出的token外，还要偿还一定数额（10%的抵押ETH）的ETH作为借贷利息。
   ```javascript function payOff() public {
