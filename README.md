@@ -13,7 +13,7 @@
 5. 运行truffle console打开truffle控制台，可以键入web3命令来获取状态数据，比如：
     - accounts = await web3.eth.getAccounts(),获取全部账户，
     - balance = await web3.eth.getBalance(account)获取指定账户余额，
-6. 以上步骤完成合约部署，运行yarn start，启动react服务，浏览器呈现dapp页面
+6. 以上步骤完成合约部署，运行yarn start，启动react服务，浏览器呈现dapp页面。
 
 **要点**
 
